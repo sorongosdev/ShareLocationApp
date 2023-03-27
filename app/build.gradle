@@ -4,6 +4,15 @@ plugins {
 }
 
 android {
+    signingConfigs{
+        debug{
+            storeFile file("sorongos.keystore.jks")
+            storePassword 'sora0258'
+            keyAlias 'androiddebug'
+            keyPassword 'sora0258'
+        }
+    }
+
     namespace 'com.sorongos.sharelocationapp'
     compileSdk 33
 
