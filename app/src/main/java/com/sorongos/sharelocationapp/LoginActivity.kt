@@ -15,6 +15,9 @@ class LoginActivity : AppCompatActivity() {
     private val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             //login failed
+            Log.e("loginActivity", "$error")
+            error.printStackTrace()
+
         } else if (token != null) {
             //login success
             Log.e("loginActivity", "login in with kakao acount token == $token")

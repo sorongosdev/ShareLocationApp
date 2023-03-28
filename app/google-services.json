@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "564639424920",
+    "project_id": "sharelocationapp-d395e",
+    "storage_bucket": "sharelocationapp-d395e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:564639424920:android:bdfec5cb7aba9320004bed",
+        "android_client_info": {
+          "package_name": "com.sorongos.sharelocationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "564639424920-vf9lhc87kl30n32lppssno76ome3him8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJfPPguNsundR-5VKYgqjBMD1w3ddi5as"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "564639424920-vf9lhc87kl30n32lppssno76ome3him8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
