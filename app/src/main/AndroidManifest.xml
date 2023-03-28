@@ -18,7 +18,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".MapActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,7 +39,7 @@
                     android:scheme="kakaoccd5a4eacd32c16e3eb23d1d177ebfec" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"/>
+        <activity android:name=".MapActivity"/>
     </application>
 
 </manifest>
