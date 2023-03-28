@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
@@ -19,7 +21,9 @@ import com.kakao.sdk.user.model.User
 import com.sorongos.sharelocationapp.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
-
+    private lateinit var binding: ActivityLoginBinding
+    private lateinit var emailLoginResult: ActivityResultLauncher<Intent>
+    private lateinit var pendingUser: User // 잠시 저장
     private val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             //login failed
@@ -32,13 +36,26 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         KakaoSdk.init(this, "ccd5a4eacd32c16e3eb23d1d177ebfec")
+
+        emailLoginResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    val email = it.data?.getStringExtra("email")
+
+                    if (email == null) {
+                        showErrorToast()
+                        return@registerForActivityResult
+                    } else {
+                        signInFirebase(pendingUser, email)
+                    }
+                }
+            }
 
         binding.kakaoTalkLoginButton.setOnClickListener {
             if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
@@ -102,6 +119,8 @@ class LoginActivity : AppCompatActivity() {
         val kakaoEmail = user.kakaoAccount?.email.orEmpty()
         if (kakaoEmail.isEmpty()) {
             //추가 이메일을 받아야함
+            pendingUser = user
+            emailLoginResult.launch(Intent(this,EmailLoginActivity::class.java))
             return
         }
         //User data를 넘김
