@@ -23,7 +23,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.mapFragment) as SupportMapFragment
+            .findFragmentById(R.id.mapFragment) as
+                SupportMapFragment
         mapFragment.getMapAsync(this)
         //callback이 구현된 mapActivity로 넘겨줌
 
