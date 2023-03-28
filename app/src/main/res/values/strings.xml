@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ShareLocationApp</string>
+    <string name="map_api_key">AIzaSyCVfzL3zk_xL5M41hk3vLMOcOrUCksIuiY</string>
 </resources>
