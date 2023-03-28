@@ -4,15 +4,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.kakao.sdk.common.util.Utility
-import com.sorongos.sharelocationapp.databinding.ActivityMainBinding
+import com.sorongos.sharelocationapp.databinding.ActivityMapBinding
 
-class MainActivity : AppCompatActivity() {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMapBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         /**default debug keyHash*/
