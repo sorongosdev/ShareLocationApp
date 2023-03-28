@@ -1,5 +1,6 @@
 package com.sorongos.sharelocationapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -18,5 +19,7 @@ class MainActivity : AppCompatActivity() {
         var keyHash = Utility.getKeyHash(this)
         println(keyHash)
         Log.e("keyhash",keyHash.toString())
+
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 }

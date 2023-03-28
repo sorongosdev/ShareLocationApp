@@ -35,6 +35,7 @@
                     android:scheme="kakaoccd5a4eacd32c16e3eb23d1d177ebfec" />
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity"/>
     </application>
 
 </manifest>

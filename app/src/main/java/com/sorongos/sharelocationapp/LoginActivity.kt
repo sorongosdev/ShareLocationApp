@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
@@ -25,6 +26,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        KakaoSdk.init(this, "ccd5a4eacd32c16e3eb23d1d177ebfec")
 
         binding.kakaoTalkLoginButton.setOnClickListener {
             if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
