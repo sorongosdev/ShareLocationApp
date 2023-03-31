@@ -90,6 +90,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         requestLocationPermission()
+        setupFirebaseDatabase()
 
 //        /**default debug keyHash*/
 //        var keyHash = Utility.getKeyHash(this)
@@ -98,13 +99,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    /**앱 실행 중일 때 위치를 게속해서 받아옴*/
     override fun onResume() {
         super.onResume()
+        getCurrentLocation()
     }
 
-    /**Background로 나가게 되면 실행*/
+    /**Background로 나가게 되면 위치를 업데이트하지 않음, 작동 중지*/
     override fun onPause() {
         super.onPause()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun getCurrentLocation() {
@@ -187,6 +191,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(LatLng(person.latitude ?: 0.0, person.longitude ?: 0.0))
                 .title(person.name.orEmpty())
         ) ?: return null
+
+        //마커에 그림
+        marker.setIcon()
 
         return marker
     }
