@@ -1,13 +1,20 @@
 package com.sorongos.sharelocationapp
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -23,11 +30,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                //fine location권한이 있음
+                getCurrentLocation()
+            }
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                //coarse location권한이 있음
+                getCurrentLocation()
+            }
+            else -> {
+                //TODO 설정으로 보내기, 교육용 팝업 띄워 다시 권한 요청
+            }
+        }
+    }
+
     //callback 자체가 인터페이스이기 때문에, 오브젝트로 구현해줌
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             //New requested location info
-            for (location in locationResult.locations){
+            for (location in locationResult.locations) {
                 location.latitude
                 location.longitude
             }
@@ -47,7 +72,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        fusedLocationClient.requestLocationUpdates(locationReqeust, locationCallback, Looper)
+        requestLocationPermission()
 
         /**default debug keyHash*/
         var keyHash = Utility.getKeyHash(this)
@@ -55,6 +80,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         Log.e("keyhash", keyHash.toString())
 
 //        startActivity(Intent(this, LoginActivity::class.java))
+    }
+
+    private fun getCurrentLocation() {
+        val locationRequest = LocationRequest
+            .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5 * 1000)
+            .build()
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermission()
+            return
+        }
+        //권한 있음
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun requestLocationPermission() {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     override fun onMapReady(map: GoogleMap) {
