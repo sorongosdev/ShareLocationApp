@@ -264,6 +264,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         googleMap.setMinZoomPreference(10.0f)
 
         googleMap.setOnMarkerClickListener(this)
+        googleMap.setOnMapClickListener {
+            trackingPersonId = "" // tracking하다가 map을 클릭했을 때 트래킹을 멈춤
+        }
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
