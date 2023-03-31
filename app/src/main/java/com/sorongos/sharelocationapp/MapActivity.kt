@@ -27,11 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -42,11 +38,12 @@ import com.google.firebase.ktx.Firebase
 import com.kakao.sdk.common.util.Utility
 import com.sorongos.sharelocationapp.databinding.ActivityMapBinding
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var binding: ActivityMapBinding
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var trackingPersonId: String = ""
 
     private val markerMap = hashMapOf<String, Marker>()
 
@@ -178,6 +175,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         markerMap[uid]?.position =
                             LatLng(person.latitude ?: 0.0, person.longitude ?: 0.0)
                     }
+
+                    /**업데이트 되고 있는 아이디와 추적하고자 하는 아이디 */
+                    if (uid == trackingPersonId){
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newCameraPosition(
+                                CameraPosition.Builder()
+                                    .target(LatLng(person.latitude ?: 0.0, person.longitude ?: 0.0))
+                                    .zoom(16.0f)
+                                    .build()
+                            )
+                        )
+                    }
                 }
 
                 override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -202,9 +211,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .title(person.name.orEmpty())
         ) ?: return null
 
+        marker.tag = uid
+
         Glide.with(this).asBitmap()
             .load(person.profilePhoto)
-                //이미지 모서리 깎기
+            //이미지 모서리 깎기
             .transform(RoundedCorners(60))
             .override(200)
             .listener(object : RequestListener<Bitmap> {
@@ -226,7 +237,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    resource?.let{
+                    resource?.let {
                         runOnUiThread {
                             marker.setIcon(
                                 BitmapDescriptorFactory.fromBitmap(
@@ -252,13 +263,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.setMaxZoomPreference(20.0f)
         googleMap.setMinZoomPreference(10.0f)
 
+        googleMap.setOnMarkerClickListener(this)
+    }
 
-//        val sydney = LatLng(-34.0, 151.0)
-//        googleMap.addMarker(
-//            MarkerOptions()
-//                .position(sydney)
-//                .title("Marker in Sydney")
-//        )
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    override fun onMarkerClick(marker: Marker): Boolean {
+
+        //marker 누르면 uid 업데이트
+        trackingPersonId = marker.tag as? String ?: ""
+
+        return false
     }
 }
