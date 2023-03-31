@@ -21,6 +21,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.kakao.sdk.common.util.Utility
 import com.sorongos.sharelocationapp.databinding.ActivityMapBinding
 
@@ -53,9 +56,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun onLocationResult(locationResult: LocationResult) {
             //New requested location info
             for (location in locationResult.locations) {
-                location.latitude
-                location.longitude
-                Log.e("MapAcitivity","onLocationResult : ${location.latitude} ${location.longitude}")
+                Log.e(
+                    "MapAcitivity",
+                    "onLocationResult : ${location.latitude} ${location.longitude}"
+                )
+
+                val uid = Firebase.auth.currentUser?.uid.orEmpty()
+
+                val locationMap = mutableMapOf<String,Any>()
+                locationMap["latitude"] = location.latitude
+                locationMap["longitude"] = location.longitude
+                Firebase.database.reference.child("Person").child(uid).updateChildren(locationMap)
             }
         }
     }
@@ -113,6 +124,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             locationCallback,
             Looper.getMainLooper()
         )
+
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude),16.0f)
+            )
+        }
     }
 
     private fun requestLocationPermission() {
@@ -125,14 +142,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap) {
+        //map init
         googleMap = map
+        //zoom 했을 때 최대 줌 레벨
+        googleMap.setMaxZoomPreference(20.0f)
+        googleMap.setMinZoomPreference(10.0f)
 
-        val sydney = LatLng(-34.0, 151.0)
-        googleMap.addMarker(
-            MarkerOptions()
-                .position(sydney)
-                .title("Marker in Sydney")
-        )
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+//        val sydney = LatLng(-34.0, 151.0)
+//        googleMap.addMarker(
+//            MarkerOptions()
+//                .position(sydney)
+//                .title("Marker in Sydney")
+//        )
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 }

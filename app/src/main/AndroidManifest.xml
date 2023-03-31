@@ -17,12 +17,19 @@
         tools:targetApi="33">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="$AIzaSyCVfzL3zk_xL5M41hk3vLMOcOrUCksIuiY" />
+            android:value="AIzaSyCVfzL3zk_xL5M41hk3vLMOcOrUCksIuiY" />
+        <activity android:name=".MapActivity"
+            android:exported="true">
 
+        </activity>
         <activity
             android:name=".LoginActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -37,14 +44,7 @@
                     android:scheme="kakaoccd5a4eacd32c16e3eb23d1d177ebfec" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity android:name=".EmailLoginActivity"/>
     </application>
 

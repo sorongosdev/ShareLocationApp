@@ -135,8 +135,6 @@ class LoginActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                     //Next process
                     updateFirebaseDatabase(user)
-                } else {
-                    showErrorToast()
                 }
             }
             .addOnFailureListener {
