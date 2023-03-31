@@ -20,8 +20,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.ChildEvent
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.kakao.sdk.common.util.Utility
@@ -32,6 +37,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapBinding
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private val markerMap = hashMapOf<String, Marker>()
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -57,13 +64,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             //New requested location info
             for (location in locationResult.locations) {
                 Log.e(
-                    "MapAcitivity",
-                    "onLocationResult : ${location.latitude} ${location.longitude}"
+                    "MapAcitivity", "onLocationResult : ${location.latitude} ${location.longitude}"
                 )
 
                 val uid = Firebase.auth.currentUser?.uid.orEmpty()
 
-                val locationMap = mutableMapOf<String,Any>()
+                val locationMap = mutableMapOf<String, Any>()
                 locationMap["latitude"] = location.latitude
                 locationMap["longitude"] = location.longitude
                 Firebase.database.reference.child("Person").child(uid).updateChildren(locationMap)
@@ -76,9 +82,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.mapFragment) as
-                SupportMapFragment
+        val mapFragment =
+            supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
         //callback이 구현된 mapActivity로 넘겨줌
 
@@ -103,16 +108,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getCurrentLocation() {
-        val locationRequest = LocationRequest
-            .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5 * 1000)
-            .build()
+        val locationRequest =
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5 * 1000).build()
 
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestLocationPermission()
@@ -120,14 +122,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         //권한 있음
         fusedLocationClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
+            locationRequest, locationCallback, Looper.getMainLooper()
         )
 
         fusedLocationClient.lastLocation.addOnSuccessListener {
             googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude),16.0f)
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
             )
         }
     }
@@ -135,10 +135,60 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun requestLocationPermission() {
         locationPermissionRequest.launch(
             arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
+    }
+
+    private fun setupFirebaseDatabase() {
+        Firebase.database.reference.child("Person")
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val person = snapshot.getValue(Person::class.java) ?: return
+                    val uid = person.uid ?: return
+
+                    //해당 uid의 마커가 null일 때만 마커맵에 마커를 추가
+                    if (markerMap[uid] == null) {
+                        markerMap[uid] = makeNewMarker(person, uid) ?: return // if null
+                    }
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    val person = snapshot.getValue(Person::class.java) ?: return
+                    val uid = person.uid ?: return
+
+                    //해당 uid의 마커가 null일 때만 마커맵에 마커를 추가
+                    if (markerMap[uid] == null) {
+                        markerMap[uid] = makeNewMarker(person, uid) ?: return // if null
+                    } else {
+                        markerMap[uid]?.position =
+                            LatLng(person.latitude ?: 0.0, person.longitude ?: 0.0)
+                    }
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+    }
+
+    private fun makeNewMarker(person: Person, uid: String): Marker? {
+        val marker = googleMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(person.latitude ?: 0.0, person.longitude ?: 0.0))
+                .title(person.name.orEmpty())
+        ) ?: return null
+
+        return marker
     }
 
     override fun onMapReady(map: GoogleMap) {
