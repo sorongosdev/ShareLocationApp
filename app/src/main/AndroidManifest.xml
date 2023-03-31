@@ -22,11 +22,7 @@
         <activity
             android:name=".LoginActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -41,7 +37,14 @@
                     android:scheme="kakaoccd5a4eacd32c16e3eb23d1d177ebfec" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapActivity"/>
+        <activity android:name=".MapActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".EmailLoginActivity"/>
     </application>
 

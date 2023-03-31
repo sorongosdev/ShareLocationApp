@@ -55,6 +55,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             for (location in locationResult.locations) {
                 location.latitude
                 location.longitude
+                Log.e("MapAcitivity","onLocationResult : ${location.latitude} ${location.longitude}")
             }
         }
     }
@@ -74,12 +75,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         requestLocationPermission()
 
-        /**default debug keyHash*/
-        var keyHash = Utility.getKeyHash(this)
-        println(keyHash)
-        Log.e("keyhash", keyHash.toString())
+//        /**default debug keyHash*/
+//        var keyHash = Utility.getKeyHash(this)
+//        println(keyHash)
+//        Log.e("keyhash", keyHash.toString())
 
-//        startActivity(Intent(this, LoginActivity::class.java))
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    /**Background로 나가게 되면 실행*/
+    override fun onPause() {
+        super.onPause()
     }
 
     private fun getCurrentLocation() {
