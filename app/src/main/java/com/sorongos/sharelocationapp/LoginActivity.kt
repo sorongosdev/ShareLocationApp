@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
@@ -43,8 +44,13 @@ class LoginActivity : AppCompatActivity() {
 
         KakaoSdk.init(this, "ccd5a4eacd32c16e3eb23d1d177ebfec")
 
-        if(Firebase.auth.currentUser != null){
-            navigateToMapActivity()
+        if(AuthApiClient.instance.hasToken()){
+            //토큰 있는지 확인하고 자동 로그인
+            UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
+                if(error == null){
+                    getKakaoAccountInfo() //
+                }
+            }
         }
 
         emailLoginResult =
