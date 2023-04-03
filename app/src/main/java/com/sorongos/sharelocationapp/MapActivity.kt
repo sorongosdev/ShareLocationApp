@@ -34,10 +34,8 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.ChildEvent
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.kakao.sdk.common.util.Utility
 import com.sorongos.sharelocationapp.databinding.ActivityMapBinding
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -98,6 +96,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+
+
+        requestLocationPermission()
+        setUpEmojiAnimationView()
+        setupFirebaseDatabase()
+
+//        /**default debug keyHash*/
+//        var keyHash = Utility.getKeyHash(this)
+//        println(keyHash)
+//        Log.e("keyhash", keyHash.toString())
+
+    }
+
+    /**리액션 이모지 셋업*/
+    private fun setUpEmojiAnimationView() {
         binding.emojiLottieAnimationView.setOnClickListener {
             if (trackingPersonId != "") { // 아무도 없으면 실행 x
                 val lastEmoji = mutableMapOf<String, Any>()
@@ -108,16 +121,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
             }
 
             binding.emojiLottieAnimationView.playAnimation()
+            binding.dummyLottieAnimationView.animate()
+                .scaleX(3f)
+                .scaleY(3f)
+                .alpha(0f)
+                .withStartAction {
+                    binding.dummyLottieAnimationView.apply {
+                        scaleX = 1f
+                        scaleY = 1f
+                        alpha = 1f
+                    }
+                }.withEndAction{
+                    binding.dummyLottieAnimationView.apply {
+                        scaleX = 1f
+                        scaleY = 1f
+                        alpha = 1f
+                    }
+                }.start()
         }
 
-        requestLocationPermission()
-        setupFirebaseDatabase()
-
-//        /**default debug keyHash*/
-//        var keyHash = Utility.getKeyHash(this)
-//        println(keyHash)
-//        Log.e("keyhash", keyHash.toString())
-
+        binding.emojiLottieAnimationView.speed = 3f
+        binding.centerLottieAnimationView.speed = 3f
     }
 
     /**앱 실행 중일 때 위치를 게속해서 받아옴*/
@@ -220,6 +244,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 override fun onDataChange(snapshot: DataSnapshot) {
                     //누를 때마다, 파이어베이스의 Emoji child가 변화 -> 애니메이션 재생
                     binding.centerLottieAnimationView.playAnimation()
+                    binding.centerLottieAnimationView.animate()
+                        .scaleX(7f)
+                        .scaleY(7f)
+                        .alpha(0.3f)
+                        .setDuration(binding.centerLottieAnimationView.duration / 3)
+                        .withEndAction {
+                            binding.centerLottieAnimationView.scaleX = 0f
+                            binding.centerLottieAnimationView.scaleY = 0f
+                            binding.centerLottieAnimationView.alpha = 1f
+                        }
                 }
 
                 override fun onCancelled(error: DatabaseError) {

@@ -11,15 +11,18 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/activity_login"
-        />
+        tools:layout="@layout/activity_login" />
+
     <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/centerLottieAnimationView"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:id="@+id/centerLottieAnimationView"
-        app:lottie_rawRes="@raw/sungrass_emoji"
         android:layout_gravity="center"
-        />
+        android:alpha="1"
+        android:scaleX="0"
+        android:scaleY="0"
+        app:lottie_rawRes="@raw/sungrass_emoji" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/emojiBottomSheetLayout"
         android:layout_width="match_parent"
@@ -27,17 +30,24 @@
         android:background="@color/black"
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/dummyLottieAnimationView"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:lottie_rawRes="@raw/sungrass_emoji" />
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/emojiLottieAnimationView"
-            app:lottie_rawRes="@raw/sungrass_emoji"
-            />
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_rawRes="@raw/sungrass_emoji" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
