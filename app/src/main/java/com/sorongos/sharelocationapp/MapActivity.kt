@@ -28,10 +28,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.ChildEvent
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -95,6 +97,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         //callback이 구현된 mapActivity로 넘겨줌
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        binding.emojiLottieAnimationView.setOnClickListener {
+            if (trackingPersonId != "") { // 아무도 없으면 실행 x
+                val lastEmoji = mutableMapOf<String, Any>()
+                lastEmoji["type"] = "star"
+                lastEmoji["lastModifier"] = System.currentTimeMillis()
+                Firebase.database.reference.child("Emoji").child(trackingPersonId)
+                    .updateChildren(lastEmoji)
+            }
+
+            binding.emojiLottieAnimationView.playAnimation()
+        }
 
         requestLocationPermission()
         setupFirebaseDatabase()
@@ -177,7 +191,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     }
 
                     /**업데이트 되고 있는 아이디와 추적하고자 하는 아이디 */
-                    if (uid == trackingPersonId){
+                    if (uid == trackingPersonId) {
                         googleMap.animateCamera(
                             CameraUpdateFactory.newCameraPosition(
                                 CameraPosition.Builder()
@@ -195,6 +209,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
                     TODO("Not yet implemented")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+        Firebase.database.reference.child("Emoji").child(Firebase.auth.currentUser?.uid ?: "")
+            .addValueEventListener(object : ValueEventListener { //하나가 바뀌면
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    //누를 때마다, 파이어베이스의 Emoji child가 변화 -> 애니메이션 재생
+                    binding.centerLottieAnimationView.playAnimation()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -273,6 +298,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         //marker 누르면 uid 업데이트
         trackingPersonId = marker.tag as? String ?: ""
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.emojiBottomSheetLayout)
+        //마커를 누르면 바텀시트가 올라옴
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         return false
     }
