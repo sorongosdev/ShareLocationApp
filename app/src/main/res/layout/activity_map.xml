@@ -17,7 +17,8 @@
         android:id="@+id/centerLottieAnimationView"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_gravity="center"
+        android:layout_marginTop="200dp"
+        android:layout_marginHorizontal="160dp"
         android:alpha="1"
         android:scaleX="0"
         android:scaleY="0"
@@ -27,11 +28,10 @@
         android:id="@+id/currentLocationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/emojiBottomSheetLayout"
-        app:layout_anchorGravity="center|top"
         android:layout_margin="30dp"
         android:src="@drawable/baseline_my_location_24"
-        />
+        app:layout_anchor="@id/emojiBottomSheetLayout"
+        app:layout_anchorGravity="center|top" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/emojiBottomSheetLayout"
@@ -40,6 +40,7 @@
         android:background="@color/black"
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/dummyLottieAnimationView"
             android:layout_width="80dp"
@@ -49,6 +50,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_rawRes="@raw/sungrass_emoji" />
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/emojiLottieAnimationView"
             android:layout_width="80dp"
