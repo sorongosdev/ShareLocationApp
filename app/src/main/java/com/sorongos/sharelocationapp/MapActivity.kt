@@ -100,6 +100,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         requestLocationPermission()
         setUpEmojiAnimationView()
+        setUpCurrentLocationView()
         setupFirebaseDatabase()
 
 //        /**default debug keyHash*/
@@ -107,6 +108,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
 //        println(keyHash)
 //        Log.e("keyhash", keyHash.toString())
 
+    }
+
+    private fun setUpCurrentLocationView() {
+        //floating button을 누르면 마지막 위치가 업데이트
+        binding.currentLocationButton.setOnClickListener {
+            moveLastLocation()
+        }
     }
 
     /**리액션 이모지 셋업*/
@@ -131,7 +139,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                         scaleY = 1f
                         alpha = 1f
                     }
-                }.withEndAction{
+                }.withEndAction {
                     binding.dummyLottieAnimationView.apply {
                         scaleX = 1f
                         scaleY = 1f
@@ -173,6 +181,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         fusedLocationClient.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper()
         )
+
+        moveLastLocation()
+    }
+
+    private fun moveLastLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermission()
+            return
+        }
 
         fusedLocationClient.lastLocation.addOnSuccessListener {
             googleMap.animateCamera(
