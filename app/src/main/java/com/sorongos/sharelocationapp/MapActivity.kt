@@ -262,8 +262,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
             })
         Firebase.database.reference.child("Emoji").child(Firebase.auth.currentUser?.uid ?: "")
-            .addValueEventListener(object : ValueEventListener { //하나가 바뀌면
-                override fun onDataChange(snapshot: DataSnapshot) {
+            .addChildEventListener(object : ChildEventListener { //하나가 바뀌면
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                     //누를 때마다, 파이어베이스의 Emoji child가 변화 -> 애니메이션 재생
                     binding.centerLottieAnimationView.playAnimation()
                     binding.centerLottieAnimationView.animate()
@@ -276,6 +276,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                             binding.centerLottieAnimationView.scaleY = 0f
                             binding.centerLottieAnimationView.alpha = 1f
                         }
+                }
+
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
