@@ -113,6 +113,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private fun setUpCurrentLocationView() {
         //floating button을 누르면 마지막 위치가 업데이트
         binding.currentLocationButton.setOnClickListener {
+            //내 위치로 갈 때는 트래킹 모드 중지
+            trackingPersonId = ""
             moveLastLocation()
         }
     }
@@ -197,7 +199,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener {
-            googleMap.animateCamera(
+            googleMap.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
             )
         }
@@ -279,19 +281,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 }
 
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onChildRemoved(snapshot: DataSnapshot) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
                 }
 
             })
